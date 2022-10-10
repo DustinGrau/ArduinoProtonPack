@@ -29,7 +29,8 @@ const int powercellEndingOffset = 1; // last led offset from the led chain for t
 
 // These are the indexes for the led's on the chain. Each jewel has 7 LEDs. If you are using a single neopixel or
 // some other neopixel configuration you will need to update these indexes to match where things are in the chain
-// by altering the "jewelCount" value (note: end value is 1 less than the # of LED's)
+// by altering the "jewelCount" value (note: end value is 1 less than the # of LED's) likewise the ventCount
+// should reflect the number of lights used for the vent (naturally)
 const int jewelCount = 1;
 const int c1Start = (powercellLedCount + powercellIndexOffset + powercellEndingOffset);
 const int c1End = (c1Start + jewelCount - 1);
@@ -39,8 +40,9 @@ const int c3Start = (c2End + 1);
 const int c3End = (c3Start + jewelCount - 1);
 const int c4Start = (c3End + 1);
 const int c4End = (c4Start + jewelCount - 1);
+const int ventCount = 4;
 const int ventStart = (c4End + 1);
-const int ventEnd = (ventStart + 3);
+const int ventEnd = (ventStart + ventCount -1);
 
 // The wand lights are a different sequence from the pack and thus use a new ordering vs. the above values.
 const int wandTop = 0;
