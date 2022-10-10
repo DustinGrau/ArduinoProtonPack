@@ -94,26 +94,30 @@ bool warning = false;
 // Also note that SparkFun notes the device has a slight delay in loading WAV
 // vs. OGG files, with each taking ~120ms to ~200ms (respectively).
 // https://learn.adafruit.com/adafruit-audio-fx-sound-board/triggering-audio
-char startupTrack[] =     "T00     WAV"; // That oh-so-satisfying startup sound
-char blastTrack[] =       "T01     WAV"; // Neutrona wand activated (throwing)
-char endTrack[] =         "T02     WAV"; // Neutrona wand deactivated (discharge)
-char idleTrack[] =        "T03     WAV"; // Post-startup cyclotron spinning sound
-char shutdownTrack[] =    "T04     WAV"; // Full pack powering-down phase
-char clickTrack[] =       "T05     WAV"; // Theme switching
-char chargeTrack[] =      "T06     WAV"; // Slightly-less nuanced startup sound
-char warnTrack[] =        "T07     WAV"; // Neutrona throw with warning
-char ventTrack[] =        "T08     WAV"; // Venting sequence before shutdown
+char startupTrack[] =     "T00     OGG"; // That oh-so-satisfying startup sound
+char blastTrack[] =       "T01     OGG"; // Neutrona wand activated (throwing)
+char endTrack[] =         "T02     OGG"; // Neutrona wand deactivated (discharge)
+char idleTrack[] =        "T03     OGG"; // Post-startup cyclotron spinning sound
+char shutdownTrack[] =    "T04     OGG"; // Full pack powering-down phase
+char clickTrack[] =       "T05     OGG"; // Theme switching
+char chargeTrack[] =      "T06     OGG"; // Slightly-less nuanced startup sound
+char warnTrack[] =        "T07     OGG"; // Neutrona throw with warning
+char ventTrack[] =        "T08     OGG"; // Venting sequence before shutdown
 // The tracks below are what are considered the "dialog" tracks
 // which are combined with the blast (neutron stream) end track
-char texTrack[] =         "T09     WAV"; // "Whoah, whoah, whoah, nice shootin' Tex!"
-char choreTrack[] =       "T10     WAV"; // "Now see, that wasn't such a chore"
-char toolsTrack[] =       "T11     WAV"; // "We had the tools, we had the talent! It's Miller time."
-char listenTrack[] =      "T12     WAV"; // "Listen...*piano keys* do you hear that?"
-char thatTrack[] =        "T13     WAV"; // "I did that, I did that, that's my fault."
-char neutronizedTrack[] = "T14     WAV"; // "We neutronized it!"
-char boxTrack[] =         "T15     WAV"; // "Two in the box, ready to go, we be fast, and they be slow!"
-// A special track which is the GB theme song
-char themeTrack[] =       "T16     OGG"; // Not included in Sounds due to copyright reasons
+char texTrack[] =         "T09     OGG"; // "Whoah, whoah, whoah, nice shootin' Tex!"
+char choreTrack[] =       "T10     OGG"; // "Well, that wasn't such a chore, now was it?"
+char toolsTrack[] =       "T11     OGG"; // "We had the tools, we had the talent! It's Miller time."
+char listenTrack[] =      "T12     OGG"; // "Listen...*piano keys* do you smell something?"
+char thatTrack[] =        "T13     OGG"; // "I did that, I did that, that's my fault."
+char neutronizedTrack[] = "T14     OGG"; // "We neutronized it!"
+char boxTrack[] =         "T15     OGG"; // "Two in the box, ready to go, we be fast, and they be slow!"
+// Special tracks which consist of real music, not included due to copyright reasons.
+char themeTrack[] =       "T16     OGG"; // Ghostbusters by Ray Parker Jr.
+char titleTrack[] =       "T17     OGG"; // Main Title by Elmer Bernstein
+char cleanTrack[] =       "T18     OGG"; // Cleanin' Up the Town by The BusBoys
+char rundmcTrack[] =      "T19     OGG"; // Ghostbusters by Run DMC
+char creditTrack[] =      "T20     OGG"; // Savin' the Day by Alessi Brothers
 
 // this queue holds a shuffled list of dialog tracks we can pull from so we don't
 // play the same ones twice; sync the number with the total defined tracks above
