@@ -11,8 +11,8 @@
 #define LOW  0x0
 
 // neopixel pins / setup
-#define NEO_POWER 2 // for cyclotron and powercell
-Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(48, NEO_POWER, NEO_GRB + NEO_KHZ800);
+#define NEO_POWER 2 // for cyclotron, powercell, and vent
+Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(20, NEO_POWER, NEO_GRB + NEO_KHZ800);
 
 #define NEO_NOSE 3 // for nose of wand
 Adafruit_NeoPixel noseJewel = Adafruit_NeoPixel(7, NEO_NOSE, NEO_GRB + NEO_KHZ800);
@@ -40,9 +40,9 @@ const int c3Start = (c2End + 1);
 const int c3End = (c3Start + jewelCount - 1);
 const int c4Start = (c3End + 1);
 const int c4End = (c4Start + jewelCount - 1);
-const int ventCount = 4;
+const int ventCount = 2;
 const int ventStart = (c4End + 1);
-const int ventEnd = (ventStart + ventCount -1);
+const int ventEnd = (ventStart + ventCount - 1);
 
 // The wand lights are a different sequence from the pack and thus use a new ordering vs. the above values.
 const int wandTop = 0;
@@ -70,9 +70,9 @@ Adafruit_Soundboard sfx = Adafruit_Soundboard(&ss, NULL, SFX_RST);
 // ##############################
 // available options
 // ##############################
-const bool useGameCyclotronEffect = true;   // set this to true to get the fading previous cyclotron light in the idle sequence
-const bool useCyclotronFadeInEffect = true; // Instead of the yellow alternate flashing on boot/vent this fades the cyclotron in from off to red
-const bool useDialogTracks = true;          // set to true if you want the dialog tracks to play after firing for 5 seconds
+const bool useGameCyclotronEffect = false;   // set this to true to get the fading previous cyclotron light in the idle sequence
+const bool useCyclotronFadeInEffect = true;  // Instead of the yellow alternate flashing on boot/vent this fades the cyclotron in from off to red
+const bool useDialogTracks = true;           // set to true if you want the dialog tracks to play after firing for 5 seconds
 
 // Possible Pack states
 bool powerBooted = false;   // has the pack booted up
@@ -82,7 +82,7 @@ bool shuttingDown = false;  // is the pack in the process of shutting down
 bool poweredDown = true;    // is the pack powered down
 bool venting = false;       // is the pack venting
 
-// physical switch states
+// Physical switch states
 bool startup = false;
 bool theme = false;
 bool safety = false;
@@ -164,7 +164,7 @@ void setup() {
 }
 
 /* ************* Audio Board Helper Functions ************* */
-// helper function to play a track (by name) on the audio board
+// helper function to play a track (by name) on the audio board; note that
 // this is not a polyphonic board so only 1 track may be played at a time
 void playAudio( char* trackname, int playing ) {
   // stop track if one is going
@@ -233,6 +233,9 @@ void loop() {
 
   // get the current switch states
   int theme_switch = digitalRead(THEME_SWITCH);
+  int startup_switch = digitalRead(STARTUP_SWITCH);
+  int safety_switch = digitalRead(SAFETY_SWITCH);
+  int fire_button = digitalRead(FIRE_BUTTON);
 
   // if the theme switch has recently changed from off to on,
   // we should play the full ghostbusters theme song
@@ -244,10 +247,6 @@ void loop() {
   } else {
     theme = false;
   }
-
-  int startup_switch = digitalRead(STARTUP_SWITCH);
-  int safety_switch = digitalRead(SAFETY_SWITCH);
-  int fire_button = digitalRead(FIRE_BUTTON);
   
   // while the startup switch is set on
   if (startup_switch == 1) {   
