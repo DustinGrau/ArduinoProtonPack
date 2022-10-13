@@ -84,7 +84,7 @@ bool venting = false;       // is the pack venting
 
 // Physical switch states
 bool startup = false;
-bool theme = false;
+bool music = false;
 bool safety = false;
 bool fire = false;
 bool warning = false;
@@ -123,6 +123,10 @@ char creditTrack[] =      "T20     OGG"; // Savin' the Day by Alessi Brothers
 // play the same ones twice; sync the number with the total defined tracks above
 QueueArray <int> dialogQueue;
 int numDialog = 7;
+
+// this queue holds a list of music tracks we can cycle through while in music mode
+QueueArray <int> musicQueue;
+int numMusic = 5;
 
 // timer trigger times/states (times are stated in milliseconds)
 unsigned long firingStateMillis;
@@ -214,6 +218,36 @@ void playDialogTrack( int playing ){
   }
 }
 
+void playMusicTrack( int playing ){
+  // if the queue is empty reseed it
+  if ( musicQueue.isEmpty() ){
+    for (int i=1; i<=numMusic; i++){
+      musicQueue.enqueue(i);
+    }
+  }
+
+  switch (musicQueue.dequeue()){
+    case (1):
+      playAudio(themeTrack, playing);
+      break;
+    case (2):
+      playAudio(titleTrack, playing);
+      break;
+    case (3):
+      playAudio(cleanTrack, playing);
+      break;
+    case (4):
+      playAudio(rundmcTrack, playing);
+      break;
+    case (5):
+      playAudio(creditTrack, playing);
+      break;
+    default: 
+      playAudio(themeTrack, playing);
+      break;
+  }
+}
+
 /* ************* Main Loop ************* */
 int cyclotronRunningFadeOut = 255;  // we reset this variable every time we change the cyclotron index so the fade effect works
 int cyclotronRunningFadeIn = 0;     // we reset this to 0 to fade the cyclotron in from nothing
@@ -237,15 +271,22 @@ void loop() {
   int safety_switch = digitalRead(SAFETY_SWITCH);
   int fire_button = digitalRead(FIRE_BUTTON);
 
-  // if the theme switch has recently changed from off to on,
-  // we should play the full ghostbusters theme song
-  if (theme_switch == 1) {
-    if (theme == false) {
-      playAudio(themeTrack, playing);
-      theme = true;
+  // get the current safety switch state
+  if (safety_switch == 1 && safety == false) {
+    safety = true;
+  }
+
+  // if the safety is on and theme switch has recently changed from off to on,
+  // then we should play a music track from our library
+  if (theme_switch == 1 && safety == true) {
+    if (music == false) {
+      music = true; // Denote that we are in music mode
+      playMusicTrack(playing); // Start with the first track
+    } else if (fire_button == 0) {
+      playMusicTrack(playing); // Advance to another track
     }
   } else {
-    theme = false;
+    music = false; // Exit music mode
   }
   
   // while the startup switch is set on
@@ -256,7 +297,7 @@ void loop() {
     }
     
     // choose the right powercell animation sequence for booted/on
-    if ( powerBooted == true ) {
+    if (powerBooted == true) {
       // standard idle power sequence for the pack
       poweredDown = false;
       shuttingDown = false;
@@ -274,15 +315,10 @@ void loop() {
     if (startup == false) {
       startup = true;
       playAudio(startupTrack, playing);
-
-      // get the current safety switch state
-      if (safety_switch == 1 && safety == false) {
-        safety = true;
-      }
     }
     
-    if ( startup == true && safety_switch == 1 ) {
-      if ( venting == false && powerBooted == true ) {
+    if (startup == true && safety_switch == 1) {
+      if (venting == false && powerBooted == true) {
         setWandLightState(backLight, 2, 0); //  set back light orange
         setWandLightState(bodyLight, 1, 0); //  set body led white
       } else {
@@ -291,9 +327,9 @@ void loop() {
       }
 
       // if the safety switch is set off then we can fire when the button is pressed
-      if ( fire_button == 0) {
+      if (fire_button == 0) {
         // if the button is just pressed we clear all led's to start the firing animations
-        if ( isFiring == false ) {
+        if (isFiring == false) {
           shutdown_leds();
           isFiring = true;
         }
@@ -337,7 +373,7 @@ void loop() {
           }
         }
       } else { // if we were firing and are no longer reset the leds
-        if ( isFiring == true ) {
+        if (isFiring == true) {
           shutdown_leds();
           isFiring = false;
         }
@@ -358,11 +394,11 @@ void loop() {
           // see if we've been firing long enough to get the dialog or vent sounds
           unsigned long diff = (unsigned long)(millis() - firingStateMillis);
 
-          if ( diff > firingWarnWaitTime) { // if we are past the warning let's vent the pack
+          if (diff > firingWarnWaitTime) { // if we are past the warning let's vent the pack
             playAudio(ventTrack, playing);
             venting = true;
             clearPowerStrip(); // play the boot animation on the powercell
-          } else if ( diff > firingWarmWaitTime) { // if in the dialog time play the dialog in sequence
+          } else if (diff > firingWarmWaitTime) { // if in the dialog time play the dialog in sequence
             if( useDialogTracks == true ){
               playDialogTrack(playing);
             }else{
@@ -389,8 +425,8 @@ void loop() {
       }
     }
   } else { // if we are powering down
-    if ( poweredDown == false ) {
-      if ( shuttingDown == false ) {
+    if (poweredDown == false) {
+      if (shuttingDown == false) {
         playAudio(shutdownTrack, playing); // play the pack shutdown track
         shuttingDown = true;
       }
@@ -406,7 +442,8 @@ void loop() {
       }
     }
   }
-  delay(1);
+
+  delay(1); // delay next loop for X milliseconds
 }
 
 /*************** Wand Light Helpers *********************/
@@ -416,7 +453,7 @@ const unsigned long wandFastFlashInterval = 100; // interval at which we flash t
 const unsigned long wandMediumFlashInterval = 500; // interval at which we flash the top led on the wand
 
 void setWandLightState(int lednum, int state, unsigned long currentMillis){
-  switch ( state ) {
+  switch (state) {
     case 0: // set led red
       wandLights.setPixelColor(lednum, wandLights.Color(255, 0, 0));
       break;
@@ -487,7 +524,7 @@ void setWandLightState(int lednum, int state, unsigned long currentMillis){
 
 /*************** Vent Light *************************/
 void setVentLightState(int startLed, int endLed, int state ){
-  switch ( state ) {
+  switch (state) {
     case 0: // set all leds to white
       for (int i=startLed; i <= endLed; i++) {
         powerStick.setPixelColor(i, powerStick.Color(255, 255, 255));
@@ -532,7 +569,7 @@ int currentBootLevel = powercellIndexOffset;                        // current p
 int currentLightLevel = powercellLedCount - powercellIndexOffset;   // current powercell boot light sequence led
 
 void setCyclotronLightState(int startLed, int endLed, int state ){
-  switch ( state ) {
+  switch (state) {
     case 0: // set all leds to red
       for (int i=startLed; i <= endLed; i++) {
         powerStick.setPixelColor(i, powerStick.Color(255, 0, 0));
@@ -583,17 +620,17 @@ void clearPowerStrip() {
   cyclotronRunningFadeIn = 0;
   
   // shutoff the leds
-  for ( int i = 0; i <= c4End; i++) {
+  for (int i = 0; i <= c4End; i++) {
     powerStick.setPixelColor(i, 0);
   }
   powerStick.show();
 
-  for ( int j=0; j<=3; j++ ){
+  for (int j=0; j<=3; j++){
     wandLights.setPixelColor(j, 0);
   }
   wandLights.show();
 
-  if ( venting == true ) {
+  if (venting == true) {
     setVentLightState(ventStart, ventEnd, 0);
   }
 }
@@ -604,7 +641,7 @@ void powerSequenceBoot(unsigned long currentMillis) {
   bool doUpdate = false;
 
   // START CYCLOTRON
-  if ( useCyclotronFadeInEffect == false ) {
+  if (useCyclotronFadeInEffect == false) {
     if ((unsigned long)(currentMillis - prevCycBootMillis) >= cyc_boot_interval) {
       prevCycBootMillis = currentMillis;
 
@@ -665,7 +702,7 @@ void powerSequenceBoot(unsigned long currentMillis) {
   }
 
   // if we have changed an led
-  if ( doUpdate == true ) {
+  if (doUpdate == true) {
     powerStick.show(); // commit all of the changes
   }
 }
@@ -720,10 +757,10 @@ void powerSequenceOne(unsigned long currentMillis, unsigned long anispeed, unsig
     }
   
     // now figure out the fading light
-    if ( (unsigned long)( currentMillis - prevFadeCycMillis) >= cycfadespeed ) {
+    if ((unsigned long)( currentMillis - prevFadeCycMillis) >= cycfadespeed) {
       prevFadeCycMillis = currentMillis;
-      if ( cycFading != -1 ) {
-        switch ( cycFading ) {
+      if (cycFading != -1) {
+        switch (cycFading) {
           case 0:
             setCyclotronLightState(c4Start, c4End, 3);
             break;
@@ -744,7 +781,7 @@ void powerSequenceOne(unsigned long currentMillis, unsigned long anispeed, unsig
     if ((unsigned long)(currentMillis - prevCycMillis) >= cycspeed) {
       prevCycMillis = currentMillis;
       
-      switch ( cycOrder ) {
+      switch (cycOrder) {
         case 0:
           setCyclotronLightState(c4Start, c4End, 2);
           setCyclotronLightState(c1Start, c1End, 0);
@@ -812,7 +849,7 @@ void powerSequenceOne(unsigned long currentMillis, unsigned long anispeed, unsig
   // END POWERCELL
 
   // if we changed anything update
-  if ( doUpdate == true ) {
+  if (doUpdate == true) {
     powerStick.show();
   }
 }
@@ -845,7 +882,7 @@ void powerSequenceShutdown(unsigned long currentMillis) {
     
     powerStick.show();
     
-    if ( powerShutdownSeqNum >= powercellIndexOffset) {
+    if (powerShutdownSeqNum >= powercellIndexOffset) {
       powerShutdownSeqNum--;
     } else {
       poweredDown = true;
@@ -863,7 +900,7 @@ int fireSeqNum = 0;
 int fireSeqTotal = 5;
 
 void clearFireStrobe() {
-  for ( int i = 0; i < 7; i++) {
+  for (int i = 0; i < 7; i++) {
     noseJewel.setPixelColor(i, 0);
   }
   noseJewel.show();
@@ -874,7 +911,7 @@ void fireStrobe(unsigned long currentMillis) {
   if ((unsigned long)(currentMillis - prevFireMillis) >= fire_interval) {
     prevFireMillis = currentMillis;
     
-    switch ( fireSeqNum ) {
+    switch (fireSeqNum) {
       case 0:
         noseJewel.setPixelColor(0, noseJewel.Color(255, 255, 255));
         noseJewel.setPixelColor(1, noseJewel.Color(255, 255, 255));
