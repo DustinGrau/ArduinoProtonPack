@@ -117,7 +117,8 @@ char themeTrack[] =       "T16     OGG"; // Ghostbusters by Ray Parker Jr.
 char titleTrack[] =       "T17     OGG"; // Main Title by Elmer Bernstein
 char cleanTrack[] =       "T18     OGG"; // Cleanin' Up the Town by The BusBoys
 char rundmcTrack[] =      "T19     OGG"; // Ghostbusters by Run DMC
-char creditTrack[] =      "T20     OGG"; // Savin' the Day by Alessi Brothers
+char savingTrack[] =      "T20     OGG"; // Savin' the Day by Alessi Brothers
+char higherTrack[] =      "T21     OGG"; // Higher and Higher by Howard Huntsberry
 
 // this queue holds a shuffled list of dialog tracks we can pull from so we don't
 // play the same ones twice; sync the number with the total defined tracks above
@@ -126,7 +127,7 @@ int numDialog = 7;
 
 // this queue holds a list of music tracks we can cycle through while in music mode
 QueueArray <int> musicQueue;
-int numMusic = 5;
+int numMusic = 6;
 
 // timer trigger times/states (times are stated in milliseconds)
 unsigned long firingStateMillis;
@@ -240,7 +241,10 @@ void playMusicTrack( int playing ){
       playAudio(rundmcTrack, playing);
       break;
     case (5):
-      playAudio(creditTrack, playing);
+      playAudio(savingTrack, playing);
+      break;
+    case (6):
+      playAudio(higherTrack, playing);
       break;
     default: 
       playAudio(themeTrack, playing);
