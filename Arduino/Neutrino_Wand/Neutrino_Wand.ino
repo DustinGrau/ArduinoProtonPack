@@ -171,6 +171,9 @@ void setup() {
 // helper function to play a track (by name) on the audio board; note that
 // this is not a polyphonic board so only 1 track may be played at a time
 void playAudio( char* trackname, int playing ) {
+  Serial.write("Playing Track:");
+  Serial.write(trackname);
+
   // stop track if one is going
   if (playing == 0) {
     sfx.stop();
@@ -274,11 +277,12 @@ void loop() {
   // get the current safety switch state
   if (safety_switch == 1 && safety == false) {
     safety = true;
+    playAudio(chargeTrack, playing);
   }
 
-  // if the safety is on and theme switch has recently changed from off to on,
+  // if the safety is set and theme switch has recently changed from off to on,
   // then we should play a music track from our library
-  if (theme_switch == 1 && safety == true) {
+  if (theme_switch == 1 && safety == false) {
     if (music == false) {
       music = true; // Denote that we are in music mode
       playMusicTrack(playing); // Start with the first track
