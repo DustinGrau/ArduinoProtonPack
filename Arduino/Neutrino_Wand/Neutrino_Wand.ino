@@ -11,27 +11,27 @@
 #define LOW  0x0
 
 // neopixel pins / setup
-#define NEO_POWER 2 // for cyclotron, powercell, and vent
-Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(20, NEO_POWER, NEO_GRB + NEO_KHZ800);
+#define NEO_POWER 2 // for powercell, cyclotron, and vent (16 + 4 + 2, YMMV)
+Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(22, NEO_POWER, NEO_GRB + NEO_KHZ800);
 
-#define NEO_NOSE 3 // for nose of wand
+#define NEO_NOSE 3 // for nose of wand (jewel has 7 LEDs)
 Adafruit_NeoPixel noseJewel = Adafruit_NeoPixel(7, NEO_NOSE, NEO_GRB + NEO_KHZ800);
 
-#define NEO_WAND 4 // for nose of wand
+#define NEO_WAND 4 // for internals of wand (total of 4 LEDs)
 Adafruit_NeoPixel wandLights = Adafruit_NeoPixel(4, NEO_WAND, NEO_GRB + NEO_KHZ800);
 
 // LED indexes into the neopixel powerstick chain for the cyclotron. Each stick has 8 neopixels for a total of
 // 16 with an index starting at 0. These offsets are because my powercell window only shows 13 leds. If you can
 // show more change the offset index and powercell count to get more or less lit.
-const int powercellLedCount = 14;    // total number of led's in the animation (15 total = LED's 0-14)
-const int powercellIndexOffset = 1;  // first led offset into the led chain for the animation
-const int powercellEndingOffset = 1; // last led offset from the led chain for the animation
+const int powercellLedCount = 14;    // total number of led's in the animation (16 total = LED's 0-15)
+const int powercellIndexOffset = 1;  // first skipped led offset into the led chain for the animation
+const int powercellEndingOffset = 1; // last skipped led offset from the led chain for the animation
 
 // These are the indexes for the led's on the chain. Each jewel has 7 LEDs. If you are using a single neopixel or
 // some other neopixel configuration you will need to update these indexes to match where things are in the chain
 // by altering the "jewelCount" value (note: end value is 1 less than the # of LED's) likewise the ventCount
 // should reflect the number of lights used for the vent (naturally)
-const int jewelCount = 1;
+const int jewelCount = 1; // LED count per "jewel" in each cyclotron socket
 const int c1Start = (powercellLedCount + powercellIndexOffset + powercellEndingOffset);
 const int c1End = (c1Start + jewelCount - 1);
 const int c2Start = (c1End + 1);
@@ -40,7 +40,7 @@ const int c3Start = (c2End + 1);
 const int c3End = (c3Start + jewelCount - 1);
 const int c4Start = (c3End + 1);
 const int c4End = (c4Start + jewelCount - 1);
-const int ventCount = 2;
+const int ventCount = 2; // Number of vent LEDs
 const int ventStart = (c4End + 1);
 const int ventEnd = (ventStart + ventCount - 1);
 
