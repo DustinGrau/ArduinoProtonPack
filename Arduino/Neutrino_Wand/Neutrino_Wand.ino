@@ -346,7 +346,7 @@ void loop() {
         barGraphSequenceTwo(currentMillis);
 
         // strobe the nose pixels
-        fireStrobe(currentMillis); 
+        fireStrobe(currentMillis);
 
         // now powercell/cyclotron/wand lights
         // if this is the first time reset some variables and play the blast track
