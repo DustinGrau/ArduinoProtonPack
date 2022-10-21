@@ -89,14 +89,14 @@ bool safety = false;
 bool fire = false;
 bool warning = false;
 
-// audio track names on soundboard, along with expected file type (WAV or OGG)
+// Map the audio track names on soundboard, along with expected file type;
 // note that the audio FX board does not support MP3 due to licensing costs.
 // Also note that SparkFun notes the device has a slight delay in loading WAV
 // vs. OGG files, with each taking ~120ms to ~200ms (respectively).
 // https://learn.adafruit.com/adafruit-audio-fx-sound-board/triggering-audio
 char startupTrack[] =     "T00     OGG"; // That oh-so-satisfying startup sound
 char blastTrack[] =       "T01     OGG"; // Neutrona wand activated (throwing)
-char endTrack[] =         "T02     OGG"; // Neutrona wand deactivated (discharge)
+char tailTrack[] =        "T02     OGG"; // Neutrona wand deactivated (discharge)
 char idleTrack[] =        "T03     OGG"; // Post-startup cyclotron spinning sound
 char shutdownTrack[] =    "T04     OGG"; // Full pack powering-down phase
 char clickTrack[] =       "T05     OGG"; // Theme switching
@@ -105,25 +105,26 @@ char warnTrack[] =        "T07     OGG"; // Neutrona throw with warning
 char ventTrack[] =        "T08     OGG"; // Venting sequence before shutdown
 // The tracks below are what are considered the "dialog" tracks
 // which are combined with the blast (neutron stream) end track
-char texTrack[] =         "T09     OGG"; // "Whoah, whoah, whoah, nice shootin' Tex!"
-char choreTrack[] =       "T10     OGG"; // "Well, that wasn't such a chore, now was it?"
-char toolsTrack[] =       "T11     OGG"; // "We had the tools, we had the talent! It's Miller time."
-char listenTrack[] =      "T12     OGG"; // "Listen...*piano keys* do you smell something?"
-char thatTrack[] =        "T13     OGG"; // "I did that, I did that, that's my fault."
-char neutronizedTrack[] = "T14     OGG"; // "We neutronized it!"
-char boxTrack[] =         "T15     OGG"; // "Two in the box, ready to go, we be fast, and they be slow!"
-// Special tracks which consist of real music, not included due to copyright reasons.
-char themeTrack[] =       "T16     OGG"; // Ghostbusters by Ray Parker Jr.
-char titleTrack[] =       "T17     OGG"; // Main Title by Elmer Bernstein
-char cleanTrack[] =       "T18     OGG"; // Cleanin' Up the Town by The BusBoys
-char rundmcTrack[] =      "T19     OGG"; // Ghostbusters by Run DMC
-char savingTrack[] =      "T20     OGG"; // Savin' the Day by Alessi Brothers
-char higherTrack[] =      "T21     OGG"; // Higher and Higher by Howard Huntsberry
+char texTrack[] =         "T21     OGG"; // "Whoah, whoah, whoah, nice shootin' Tex!"
+char listenTrack[] =      "T22     OGG"; // "Listen...*piano keys* do you smell something?"
+char faultTrack[] =       "T23     OGG"; // "I did that, I did that, that's my fault."
+char streamsTrack[] =     "T24     OGG"; // "T24 - There's something very important I forgot to tell you. What? Don't cross the streams."
+char choreTrack[] =       "T25     OGG"; // "Well, that wasn't such a chore, now was it?"
+char neutronizedTrack[] = "T26     OGG"; // "We neutronized it!"
+char toolsTrack[] =       "T27     OGG"; // "We had the tools, we had the talent! It's Miller time."
+char boxTrack[] =         "T28     OGG"; // "Two in the box, ready to go, we be fast, and they be slow!"
+// Special tracks which consist of real music.
+char themeTrack[] =       "T31     OGG"; // Ghostbusters by Ray Parker Jr.
+char titleTrack[] =       "T32     OGG"; // Main Title by Elmer Bernstein
+char cleanTrack[] =       "T33     OGG"; // Cleanin' Up the Town by The BusBoys
+char rundmcTrack[] =      "T34     OGG"; // Ghostbusters by Run DMC
+char savingTrack[] =      "T35     OGG"; // Savin' the Day by Alessi Brothers
+char higherTrack[] =      "T36     OGG"; // Higher and Higher by Howard Huntsberry
 
 // this queue holds a shuffled list of dialog tracks we can pull from so we don't
 // play the same ones twice; sync the number with the total defined tracks above
 QueueArray <int> dialogQueue;
-int numDialog = 7;
+int numDialog = 8;
 
 // this queue holds a list of music tracks we can cycle through while in music mode
 QueueArray <int> musicQueue;
@@ -190,7 +191,7 @@ void playDialogTrack( int playing ){
       dialogQueue.enqueue(i);
     }
   }
-  
+
   switch (dialogQueue.dequeue()){
     case (1):
       playAudio(texTrack, playing);
@@ -199,13 +200,13 @@ void playDialogTrack( int playing ){
       playAudio(listenTrack, playing);
       break;
     case (3):
-      playAudio(choreTrack, playing);
+      playAudio(faultTrack, playing);
       break;
     case (4):
-      playAudio(boxTrack, playing);
+      playAudio(streamsTrack, playing);
       break;
     case (5):
-      playAudio(thatTrack, playing);
+      playAudio(choreTrack, playing);
       break;
     case (6):
       playAudio(neutronizedTrack, playing);
@@ -213,8 +214,11 @@ void playDialogTrack( int playing ){
     case (7):
       playAudio(toolsTrack, playing);
       break;
+    case (8):
+      playAudio(boxTrack, playing);
+      break;
     default: 
-      playAudio(endTrack, playing);
+      playAudio(tailTrack, playing);
       break;
   }
 }
@@ -410,10 +414,10 @@ void loop() {
             if( useDialogTracks == true ){
               playDialogTrack(playing);
             }else{
-              playAudio(endTrack, playing);
+              playAudio(tailTrack, playing);
             }
           } else {
-            playAudio(endTrack, playing);
+            playAudio(tailTrack, playing);
           }
         }
       }
