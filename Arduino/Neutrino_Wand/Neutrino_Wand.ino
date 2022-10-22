@@ -97,18 +97,18 @@ bool warning = false;
 char startupTrack[] =     "T00     OGG"; // That oh-so-satisfying startup sound
 char blastTrack[] =       "T01     OGG"; // Neutrona wand activated (throwing)
 char tailTrack[] =        "T02     OGG"; // Neutrona wand deactivated (discharge)
-char idleTrack[] =        "T03     OGG"; // Post-startup cyclotron spinning sound
+char idleTrack[] =        "T03     OGG"; // Post-startup cyclotron humming loop
 char shutdownTrack[] =    "T04     OGG"; // Full pack powering-down phase
-char clickTrack[] =       "T05     OGG"; // Theme switching
+char clickTrack[] =       "T05     OGG"; // Theme/mode switching "click"
 char chargeTrack[] =      "T06     OGG"; // Slightly-less nuanced startup sound
 char warnTrack[] =        "T07     OGG"; // Neutrona throw with warning
 char ventTrack[] =        "T08     OGG"; // Venting sequence before shutdown
 // The tracks below are what are considered the "dialog" tracks
-// which are combined with the blast (neutron stream) end track
+// which are combined with the blast (neutron stream) tail track
 char texTrack[] =         "T21     OGG"; // "Whoah, whoah, whoah, nice shootin' Tex!"
 char listenTrack[] =      "T22     OGG"; // "Listen...*piano keys* do you smell something?"
 char faultTrack[] =       "T23     OGG"; // "I did that, I did that, that's my fault."
-char streamsTrack[] =     "T24     OGG"; // "T24 - There's something very important I forgot to tell you. What? Don't cross the streams."
+char streamsTrack[] =     "T24     OGG"; // "There's something very important I forgot to tell you. Don't cross the streams."
 char choreTrack[] =       "T25     OGG"; // "Well, that wasn't such a chore, now was it?"
 char neutronizedTrack[] = "T26     OGG"; // "We neutronized it!"
 char toolsTrack[] =       "T27     OGG"; // "We had the tools, we had the talent! It's Miller time."
