@@ -110,16 +110,17 @@ char listenTrack[] =      "T22     OGG"; // "Listen...*piano keys* do you smell 
 char faultTrack[] =       "T23     OGG"; // "I did that, I did that, that's my fault."
 char streamsTrack[] =     "T24     OGG"; // "There's something very important I forgot to tell you. Don't cross the streams."
 char choreTrack[] =       "T25     OGG"; // "Well, that wasn't such a chore, now was it?"
-char neutronizedTrack[] = "T26     OGG"; // "We neutronized it!"
+char neutronizedTrack[] = "T26     OGG"; // "We neutronized it! Full plutonic reversal."
 char toolsTrack[] =       "T27     OGG"; // "We had the tools, we had the talent! It's Miller time."
 char boxTrack[] =         "T28     OGG"; // "Two in the box, ready to go, we be fast, and they be slow!"
 // Special tracks which consist of real music.
 char themeTrack[] =       "T31     OGG"; // Ghostbusters by Ray Parker Jr.
 char titleTrack[] =       "T32     OGG"; // Main Title by Elmer Bernstein
 char cleanTrack[] =       "T33     OGG"; // Cleanin' Up the Town by The BusBoys
-char rundmcTrack[] =      "T34     OGG"; // Ghostbusters by Run DMC
-char savingTrack[] =      "T35     OGG"; // Savin' the Day by Alessi Brothers
+char savingTrack[] =      "T34     OGG"; // Savin' the Day by Alessi Brothers
+char rundmcTrack[] =      "T35     OGG"; // Ghostbusters by Run DMC
 char higherTrack[] =      "T36     OGG"; // Higher and Higher by Howard Huntsberry
+char ourOwnTrack[] =      "T37     OGG"; // On Our Own by Bobby Brown
 
 // this queue holds a shuffled list of dialog tracks we can pull from so we don't
 // play the same ones twice; sync the number with the total defined tracks above
@@ -128,7 +129,7 @@ int numDialog = 8;
 
 // this queue holds a list of music tracks we can cycle through while in music mode
 QueueArray <int> musicQueue;
-int numMusic = 6;
+int numMusic = 7;
 
 // timer trigger times/states (times are stated in milliseconds)
 unsigned long firingStateMillis;
@@ -242,13 +243,16 @@ void playMusicTrack( int playing ){
       playAudio(cleanTrack, playing);
       break;
     case (4):
-      playAudio(rundmcTrack, playing);
+      playAudio(savingTrack, playing);
       break;
     case (5):
-      playAudio(savingTrack, playing);
+      playAudio(rundmcTrack, playing);
       break;
     case (6):
       playAudio(higherTrack, playing);
+      break;
+    case (6):
+      playAudio(ourOwnTrack, playing);
       break;
     default: 
       playAudio(themeTrack, playing);
