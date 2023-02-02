@@ -251,7 +251,7 @@ void playMusicTrack( int playing ){
     case (6):
       playAudio(higherTrack, playing);
       break;
-    case (6):
+    case (7):
       playAudio(ourOwnTrack, playing);
       break;
     default: 
