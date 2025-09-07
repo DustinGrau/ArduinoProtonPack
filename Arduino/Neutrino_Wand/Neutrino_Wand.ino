@@ -1,18 +1,51 @@
-#include <QueueArray.h>
-
 // for the sound board
 #include <SoftwareSerial.h>
 #include "Adafruit_Soundboard.h"
 
 #include <Adafruit_NeoPixel.h>
 
+#define SIMPLE_QUEUE_MAX 16
+
+class SimpleQueue {
+  public:
+    SimpleQueue() : head(0), tail(0), count(0) {}
+
+    void enqueue(int value) {
+      if (count < SIMPLE_QUEUE_MAX) {
+        data[tail] = value;
+        tail = (tail + 1) % SIMPLE_QUEUE_MAX;
+        count++;
+      }
+    }
+
+    int dequeue() {
+      if (count == 0) return -1;
+      int value = data[head];
+      head = (head + 1) % SIMPLE_QUEUE_MAX;
+      count--;
+      return value;
+    }
+
+    bool isEmpty() {
+      return count == 0;
+    }
+
+    void clear() {
+      head = tail = count = 0;
+    }
+
+  private:
+    int data[SIMPLE_QUEUE_MAX];
+    int head, tail, count;
+};
+
 // for led triggers
 #define HIGH 0x1
 #define LOW  0x0
 
 // neopixel pins / setup
-#define NEO_POWER 2 // for powercell, cyclotron, and vent (16 + 4 + 2, YMMV)
-Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(22, NEO_POWER, NEO_GRB + NEO_KHZ800);
+#define NEO_POWER 2 // for powercell, cyclotron, and vent (16 + 28 + 7, YMMV)
+Adafruit_NeoPixel powerStick = Adafruit_NeoPixel(51, NEO_POWER, NEO_GRBW + NEO_KHZ800);
 
 #define NEO_NOSE 3 // for nose of wand (jewel has 7 LEDs)
 Adafruit_NeoPixel noseJewel = Adafruit_NeoPixel(7, NEO_NOSE, NEO_GRB + NEO_KHZ800);
@@ -31,18 +64,18 @@ const int powercellEndingOffset = 1; // last skipped led offset from the led cha
 // some other neopixel configuration you will need to update these indexes to match where things are in the chain
 // by altering the "jewelCount" value (note: end value is 1 less than the # of LED's) likewise the ventCount
 // should reflect the number of lights used for the vent (naturally)
-const int jewelCount = 1; // LED count per "jewel" in each cyclotron socket
-const int c1Start = (powercellLedCount + powercellIndexOffset + powercellEndingOffset);
-const int c1End = (c1Start + jewelCount - 1);
-const int c2Start = (c1End + 1);
-const int c2End = (c2Start + jewelCount - 1);
-const int c3Start = (c2End + 1);
-const int c3End = (c3Start + jewelCount - 1);
-const int c4Start = (c3End + 1);
-const int c4End = (c4Start + jewelCount - 1);
-const int ventCount = 2; // Number of vent LEDs
-const int ventStart = (c4End + 1);
-const int ventEnd = (ventStart + ventCount - 1);
+const int jewelCount = 7; // LED count per "jewel" in each cyclotron socket
+const int c1Start = (powercellLedCount + powercellIndexOffset + powercellEndingOffset); // 16
+const int c1End = (c1Start + jewelCount - 1);     // 22
+const int c2Start = (c1End + 1);                  // 23
+const int c2End = (c2Start + jewelCount - 1);     // 29
+const int c3Start = (c2End + 1);                  // 30
+const int c3End = (c3Start + jewelCount - 1);     // 36
+const int c4Start = (c3End + 1);                  // 37
+const int c4End = (c4Start + jewelCount - 1);     // 43
+const int ventCount = jewelCount; // Number of vent LEDs
+const int ventStart = (c4End + 1);                // 44
+const int ventEnd = (ventStart + ventCount - 1);  // 50
 
 // The wand lights are a different sequence from the pack and thus use a new ordering vs. the above values.
 const int wandTop = 0;
@@ -124,11 +157,11 @@ char ourOwnTrack[] =      "T37     OGG"; // On Our Own by Bobby Brown
 
 // this queue holds a shuffled list of dialog tracks we can pull from so we don't
 // play the same ones twice; sync the number with the total defined tracks above
-QueueArray <int> dialogQueue;
+SimpleQueue dialogQueue;
 int numDialog = 8;
 
 // this queue holds a list of music tracks we can cycle through while in music mode
-QueueArray <int> musicQueue;
+SimpleQueue musicQueue;
 int numMusic = 7;
 
 // timer trigger times/states (times are stated in milliseconds)
@@ -543,12 +576,12 @@ void setVentLightState(int startLed, int endLed, int state ){
   switch (state) {
     case 0: // set all leds to white
       for (int i=startLed; i <= endLed; i++) {
-        powerStick.setPixelColor(i, powerStick.Color(255, 255, 255));
+        powerStick.setPixelColor(i, powerStick.Color(0, 0, 0, 255));
       }
       break;
     case 1: // set all leds to blue
       for (int i=startLed; i <= endLed; i++) {
-        powerStick.setPixelColor(i, powerStick.Color(0, 0, 255));
+        powerStick.setPixelColor(i, powerStick.Color(0, 0, 255, 64));
       }
       break;
     case 2: // set all leds off
@@ -584,16 +617,16 @@ int powerShutdownSeqNum = powercellLedCount - powercellIndexOffset; // shutdown 
 int currentBootLevel = powercellIndexOffset;                        // current powercell boot level sequence led
 int currentLightLevel = powercellLedCount - powercellIndexOffset;   // current powercell boot light sequence led
 
-void setCyclotronLightState(int startLed, int endLed, int state ){
+void setCyclotronLightState(int startLed, int endLed, int state){
   switch (state) {
     case 0: // set all leds to red
       for (int i=startLed; i <= endLed; i++) {
-        powerStick.setPixelColor(i, powerStick.Color(255, 0, 0));
+        powerStick.setPixelColor(i, powerStick.Color(255, 0, 0, 64));
       }
       break;
     case 1: // set all leds to orange
       for (int i=startLed; i <= endLed; i++) {
-        powerStick.setPixelColor(i, powerStick.Color(255, 106, 0));
+        powerStick.setPixelColor(i, powerStick.Color(255, 106, 0, 64));
       }
       break;
     case 2: // set all leds off
@@ -617,7 +650,7 @@ void setCyclotronLightState(int startLed, int endLed, int state ){
           powerStick.setPixelColor(i, 255 * cyclotronRunningFadeIn/255, 0, 0);
           cyclotronRunningFadeIn++;
         } else {
-          powerStick.setPixelColor(i, powerStick.Color(255, 0, 0));
+          powerStick.setPixelColor(i, powerStick.Color(255, 0, 0, 128));
         }
       }
       break;
@@ -698,14 +731,14 @@ void powerSequenceBoot(unsigned long currentMillis) {
         if (currentLightLevel+1 <= powerSeqTotal) {
           powerStick.setPixelColor(currentLightLevel+1, 0);
         }
-        powerStick.setPixelColor(currentBootLevel, powerStick.Color(0, 0, 255));
+        powerStick.setPixelColor(currentBootLevel, powerStick.Color(0, 0, 255, 128));
         currentLightLevel = powerSeqTotal;
         currentBootLevel++;
       } else {
         if (currentLightLevel+1 <= powerSeqTotal) {
           powerStick.setPixelColor(currentLightLevel+1, 0);
         }
-        powerStick.setPixelColor(currentLightLevel, powerStick.Color(0, 0, 255));
+        powerStick.setPixelColor(currentLightLevel, powerStick.Color(0, 0, 255, 128));
         currentLightLevel--;
       }
       doUpdate = true;
@@ -848,7 +881,7 @@ void powerSequenceOne(unsigned long currentMillis, unsigned long anispeed, unsig
 
     for ( int i = powercellIndexOffset; i <= powerSeqTotal; i++) {
       if ( i <= powerSeqNum ) {
-        powerStick.setPixelColor(i, powerStick.Color(0, 0, 150));
+        powerStick.setPixelColor(i, powerStick.Color(0, 0, 150, 64));
       } else {
         powerStick.setPixelColor(i, 0);
       }
@@ -890,7 +923,7 @@ void powerSequenceShutdown(unsigned long currentMillis) {
     // START POWERCELL
     for ( int i = powerSeqTotal; i >= powercellIndexOffset; i--) {
       if ( i <= powerShutdownSeqNum ) {
-        powerStick.setPixelColor(i, powerStick.Color(0, 0, 150));
+        powerStick.setPixelColor(i, powerStick.Color(0, 0, 150, 64));
       } else {
         powerStick.setPixelColor(i, 0);
       }
